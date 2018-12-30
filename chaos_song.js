@@ -1,28 +1,26 @@
 let myScale;
+
 let cellWidth;
-let pos;
-let note;
+let toTranslate = 10;
 
 let vertices = [];
-let current;
-let notClicked = true;
-let n = 3;
-let prev;
-let allowVertexRepeat = false;
-
-let sound = true;
 let points = [];
-
-let i = 0;
+let current;
+let prev;
 
 let synthsAmount = 32;
 let synths = []
-
-let ppf = 1;
+let synthIndex = 0;
 
 let clearBtn;
 
-let myCanvas;
+// Settings
+let n = 3;
+let allowVertexRepeat = false;
+let ppf = 1;
+let sound = true;
+let notClicked = true;
+
 
 function setup() {
 
@@ -34,7 +32,7 @@ function setup() {
                "C4", "D4", "E4", "G4", "A4",
                "C5", "D5", "E5", "G5", "A5", "C6" ];
 
-    myCanvas = createCanvas(600,600);
+    let myCanvas = createCanvas(600,600);
     myCanvas.parent("canvasContainer");
 
     myCanvas.mousePressed(canvasMousePress);
@@ -63,7 +61,7 @@ function reset(){
 function draw() {
 
     drawBackground();
-    translate(10,10);
+    translate(toTranslate, toTranslate);
 
     if(notClicked){
         showStartScreen();
@@ -106,11 +104,11 @@ function drawBackground() {
     background("#2A2E38");
 
     for(let i = 0 ; i < myScale.length ; i++ ){
-        stroke(255, 255, 255, 5);
+        stroke(255, 255, 255, 10);
         strokeWeight(1);
         noFill();
         let pos = floor(map(i,0,myScale.length-1,height,0));
-        line(0, pos, width, pos);
+        line(0, pos + toTranslate, width, pos + toTranslate);
     }
 }
 
@@ -186,16 +184,19 @@ function createSynth() {
 
 function play(y) {
 
-    let synth = synths[i++ % synthsAmount];
+    let synth = synths[synthIndex++ % synthsAmount];
 
-    pos = floor(map(y,height,0,0,myScale.length-1));
-    note = myScale[pos];
+    let pos = floor(map(y,height,0,0,myScale.length-1));
+    let note = myScale[pos];
     synth.triggerAttackRelease(note, 0.01);
     synth.volume.value = 1;
 }
 
 function drawMouse(){
+    push();
+    translate(-toTranslate,-toTranslate);
     drawPoint({x: mouseX, y: mouseY}, "#F76B66", true, 5);
+    pop();
 }
 
 function canvasMousePress(){
@@ -205,7 +206,7 @@ function canvasMousePress(){
     }
     else {
         drawMouse();
-        play(mouseY);
+        play(mouseY - toTranslate);
     }
 }
 
