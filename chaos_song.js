@@ -1,4 +1,3 @@
-let wave;
 let myScale;
 let cellWidth;
 let pos;
@@ -23,6 +22,8 @@ let pff = 1;
 
 let clearBtn;
 
+let myCanvas;
+
 function setup() {
 
     for(let i = 0 ; i < synthsAmount ; i++ ){
@@ -33,18 +34,19 @@ function setup() {
                "C4", "D4", "E4", "G4", "A4",
                "C5", "D5", "E5", "G5", "A5", "C6" ];
 
+    myCanvas = createCanvas(600,600);
+    myCanvas.parent("canvasContainer");
+
+    myCanvas.mousePressed(canvasMousePress);
+
     cellWidth = width/myScale.length;
 
-    let myCanvas = createCanvas(600,600);
-    myCanvas.parent("canvasContainer");
-    background(0);
-
     clearBtn = document.getElementById('clear');
-
     clearBtn.addEventListener('click', reset);
 }
 
 function reset(){
+
     points = [];
     vertices = [];
     for(let i = 0 ; i < n ; i++) {
@@ -58,11 +60,6 @@ function reset(){
 
 function draw() {
     drawBackground();
-
-    if(mouseIsPressed && notClicked){
-        notClicked = false;
-        reset();
-    }
 
     if(notClicked){
         showStartScreen();
@@ -108,7 +105,8 @@ function drawBackground() {
         stroke(0, 0, 0, 10);
         strokeWeight(1);
         noFill();
-        rect(0, 0 + i * (height / myScale.length), width, height);
+        let pos = floor(map(i,0,myScale.length-1,height,0));
+        line(0, pos, width, pos);
     }
 }
 
@@ -191,3 +189,20 @@ function play(y) {
     synth.triggerAttackRelease(note, 0.01);
     synth.volume.value = 1;
 }
+
+function drawMouse(){
+    drawPoint({x: mouseX, y: mouseY}, "#F76B66", true, 5);
+}
+
+function canvasMousePress(){
+    if(notClicked){
+        notClicked = false;
+        reset();
+    }
+    else {
+        drawMouse();
+        play(mouseY);
+    }
+}
+
+
