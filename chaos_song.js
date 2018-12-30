@@ -131,7 +131,7 @@ function showStartScreen(){
     noStroke();
     textSize(50);
     textAlign(CENTER, CENTER);
-    text("Click anywhere to start...", width / 2, height / 2);
+    text("Click to start", width / 2, height / 2);
 }
 
 function drawVertices(){
