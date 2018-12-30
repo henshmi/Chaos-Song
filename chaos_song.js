@@ -15,10 +15,10 @@ let points = [];
 
 let i = 0;
 
-let synthsAmount = 100;
+let synthsAmount = 32;
 let synths = []
 
-let pff = 1;
+let ppf = 1;
 
 let clearBtn;
 
@@ -40,6 +40,8 @@ function setup() {
     myCanvas.mousePressed(canvasMousePress);
 
     cellWidth = width/myScale.length;
+    width = 580;
+    height = 580;
 
     clearBtn = document.getElementById('clear');
     clearBtn.addEventListener('click', reset);
@@ -59,7 +61,9 @@ function reset(){
 }
 
 function draw() {
+
     drawBackground();
+    translate(10,10);
 
     if(notClicked){
         showStartScreen();
@@ -72,7 +76,7 @@ function draw() {
     drawVertices();
     drawPoints(points);
 
-    for(let i = 0 ; i < pff ; i++ ){
+    for(let i = 0 ; i < ppf ; i++ ){
         let next = random(vertices);
 
         if(next && allowVertexRepeat || prev !== next) {
@@ -99,10 +103,10 @@ function draw() {
 }
 
 function drawBackground() {
-    background("#3c847d");
+    background("#2A2E38");
 
     for(let i = 0 ; i < myScale.length ; i++ ){
-        stroke(0, 0, 0, 10);
+        stroke(255, 255, 255, 5);
         strokeWeight(1);
         noFill();
         let pos = floor(map(i,0,myScale.length-1,height,0));
@@ -121,7 +125,7 @@ function updateSettings(){
     }
     sound = document.getElementById('soundOn').checked;
     allowVertexRepeat = document.getElementById('vertexRepeat').checked;
-    pff = document.getElementById('pff').value;
+    ppf = document.getElementById('ppf').value;
 }
 
 function showStartScreen(){
@@ -172,7 +176,7 @@ function createSynth() {
             harmonicity: 3.4
         },
         envelope: {
-            attack: 0.1,
+            attack: 0.2,
             decay: 0.1,
             sustain: 0.5,
             release: 10
