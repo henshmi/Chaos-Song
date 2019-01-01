@@ -14,12 +14,17 @@ let synthIndex = 0;
 
 let clearBtn;
 
+let translated = false;
+
 // Settings
 let n = 3;
 let allowVertexRepeat = false;
 let ppf = 1;
 let sound = true;
 let notClicked = true;
+let pace;
+let volume = 5;
+let interval;
 
 
 function setup() {
@@ -37,12 +42,15 @@ function setup() {
 
     myCanvas.mousePressed(canvasMousePress);
 
+
     cellWidth = width/myScale.length;
     width = 580;
     height = 580;
 
     clearBtn = document.getElementById('clear');
     clearBtn.addEventListener('click', reset);
+
+    noLoop();
 }
 
 function reset(){
@@ -60,8 +68,13 @@ function reset(){
 
 function draw() {
 
+    if(!translated){
+        translate(toTranslate, toTranslate);        
+        translated = true;
+    }
+
     drawBackground();
-    translate(toTranslate, toTranslate);
+    
 
     if(notClicked){
         showStartScreen();
@@ -90,7 +103,7 @@ function draw() {
     
             drawPoint(current, "#F76B66");
     
-            if(sound){
+            if(sound && volume > 0){
                 play(current.y);
             }
     
@@ -108,19 +121,26 @@ function drawBackground() {
         strokeWeight(1);
         noFill();
         let pos = floor(map(i,0,myScale.length-1,height,0));
-        line(0, pos + toTranslate, width, pos + toTranslate);
+        line(0, pos, width, pos);
     }
 }
 
 function updateSettings(){
-    let pace = document.getElementById('pace').value;
-    frameRate(Number(pace));
+    let currentPace = document.getElementById('pace').value;
+    if(pace !== currentPace){
+        pace = currentPace;
+        clearInterval(interval);
+        interval = setInterval(() => {
+            draw()
+        }, 1000 / pace);
+    }
     let vertices = document.getElementById('vertices').value;
     if(n != vertices){
         n = Number(vertices);
         current = null;
         reset();
     }
+    volume = document.getElementById('volume').value;
     sound = document.getElementById('soundOn').checked;
     allowVertexRepeat = document.getElementById('vertexRepeat').checked;
     ppf = document.getElementById('ppf').value;
@@ -166,7 +186,8 @@ function drawPoint(p, color, background = true, size = 3) {
 }
 
 function createSynth() {
-    return new Tone.Synth({
+    return new Tone.Synth(
+    {
         oscillator: {
             type: 'sine',
             modulationType: 'sine',
@@ -179,7 +200,8 @@ function createSynth() {
             sustain: 0.5,
             release: 10
         }
-    }).toMaster();
+    }
+    ).toMaster();
 }
 
 function play(y) {
@@ -189,7 +211,7 @@ function play(y) {
     let pos = floor(map(y,height,0,0,myScale.length-1));
     let note = myScale[pos];
     synth.triggerAttackRelease(note, 0.01);
-    synth.volume.value = 1;
+    synth.volume.value = volume;
 }
 
 function drawMouse(){
@@ -203,10 +225,13 @@ function canvasMousePress(){
     if(notClicked){
         notClicked = false;
         reset();
+        draw();
     }
     else {
         drawMouse();
-        play(mouseY - toTranslate);
+        if(sound && volume > 0){
+            play(mouseY - toTranslate);
+        }
     }
 }
 
